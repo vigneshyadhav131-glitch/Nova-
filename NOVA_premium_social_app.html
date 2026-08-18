@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NOVA — Connect. Create. Live.</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#07080d;--panel:#10121a;--panel2:#171a24;--line:#252938;--text:#fff;--muted:#9298a9;--pink:#ff3d81;--purple:#8b5cf6;--blue:#4f8cff;--green:#25d366}
+body{font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+button,input,textarea{font:inherit}button{cursor:pointer;border:0;color:#fff}
+.hidden{display:none!important}
+
+/* LOGIN */
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at 20% 15%,#7c3aed55,transparent 30%),radial-gradient(circle at 85% 85%,#2563eb44,transparent 32%),#07080d}
+.auth{width:410px;max-width:95%;background:#11131bdd;border:1px solid #ffffff12;border-radius:28px;padding:36px;box-shadow:0 30px 100px #000;backdrop-filter:blur(25px)}
+.brand{text-align:center;font-size:48px;font-weight:900;letter-spacing:-4px;background:linear-gradient(90deg,#fff,#ff4f9a,#8b5cf6,#4f8cff);-webkit-background-clip:text;color:transparent}
+.tag{text-align:center;color:var(--muted);margin:6px 0 28px}
+.auth input,.auth select{width:100%;padding:14px;margin:6px 0;background:#1b1e28;border:1px solid var(--line);border-radius:12px;color:#fff;outline:none}
+.btn{width:100%;padding:14px;border-radius:12px;background:linear-gradient(90deg,var(--pink),var(--purple),var(--blue));font-weight:800;margin-top:10px}
+.outline{background:transparent;border:1px solid var(--line)}
+.auth-switch{text-align:center;color:var(--muted);font-size:13px;margin-top:18px}
+.auth-switch span{color:#a78bfa;cursor:pointer}
+.err{text-align:center;color:#ff6b6b;font-size:12px;margin-top:8px}
+
+/* APP */
+#app{display:none}.layout{min-height:100vh}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:245px;padding:25px 15px;border-right:1px solid var(--line);background:#090a0f;z-index:30}
+.sidebrand{font-size:32px;font-weight:900;letter-spacing:-2px;margin:5px 12px 38px}
+.nav{display:grid;gap:6px}.nav button{padding:14px;text-align:left;background:transparent;border-radius:13px;color:#e7e8ee}.nav button:hover,.nav button.active{background:#1a1d27}.nav b{display:inline-block;width:30px;font-size:19px}
+.main{margin-left:245px;padding:28px;max-width:1250px}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}.top h1{font-size:25px}.top p{color:var(--muted);font-size:12px;margin-top:4px}
+.circle{width:42px;height:42px;border-radius:50%;background:var(--panel);border:1px solid var(--line)}
+.top-actions{display:flex;gap:9px}
+
+/* HOME */
+.page{display:none}.page.active{display:block}
+.stories{display:flex;gap:17px;overflow:auto;padding:5px 0 24px}.story{min-width:72px;text-align:center}.ring{width:68px;height:68px;margin:auto;padding:3px;border-radius:50%;background:linear-gradient(45deg,#ff9d00,#ff2f72,#8b5cf6,#3b82f6)}.story-in{height:100%;border:3px solid #07080d;border-radius:50%;background:#242734;display:flex;align-items:center;justify-content:center;font-weight:800}.story small{display:block;color:#b8bbc6;margin-top:7px;font-size:11px}
+.feed{max-width:680px;margin:auto}.post{background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-bottom:25px}.posthead{display:flex;align-items:center;gap:10px;padding:14px}.avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--pink),var(--purple),var(--blue));font-weight:800;overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover}.user{flex:1}.user strong{display:block;font-size:14px}.user small{color:var(--muted)}.more{background:none;font-size:18px}.postmedia{height:470px;background:linear-gradient(135deg,#20143d,#142d52);display:flex;align-items:center;justify-content:center;font-size:90px}.postactions{display:flex;gap:16px;padding:13px}.postactions button{background:none;font-size:22px}.postactions .save{margin-left:auto}.likes,.caption{padding:0 15px 9px;font-size:13px}.caption{padding-bottom:18px;color:#d9dbe2}.caption b{color:#fff}
+
+/* EXPLORE */
+.search{width:100%;background:var(--panel);border:1px solid var(--line);color:#fff;padding:15px;border-radius:14px;outline:none;margin-bottom:15px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.tile{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:40px;background:linear-gradient(135deg,#21143e,#122b4d)}
+
+/* MESSAGES */
+.messageLayout{display:grid;grid-template-columns:285px 1fr;height:calc(100vh - 130px);min-height:520px;border:1px solid var(--line);border-radius:20px;overflow:hidden}.contacts{border-right:1px solid var(--line);background:#0d0f15}.contactTitle{padding:20px;font-size:20px;font-weight:800}.contact{display:flex;align-items:center;gap:10px;padding:13px 15px;cursor:pointer}.contact:hover,.contact.sel{background:#191c25}.contact .info{flex:1}.contact .info strong{display:block;font-size:13px}.contact .info small{color:var(--muted)}.dot{width:8px;height:8px;background:#22c55e;border-radius:50%}
+.chat{display:flex;flex-direction:column;background:#090b10}.chatHead{display:flex;align-items:center;gap:10px;padding:14px;border-bottom:1px solid var(--line)}.chatInfo{flex:1}.chatInfo strong{display:block}.chatInfo small{color:#22c55e}.callBtns button{width:39px;height:39px;border-radius:50%;background:var(--panel);border:1px solid var(--line);margin-left:5px}.chatBody{flex:1;overflow:auto;padding:20px}.bubble{max-width:68%;padding:11px 14px;border-radius:17px;margin:7px 0;font-size:14px;word-break:break-word}.bubble.me{margin-left:auto;background:linear-gradient(135deg,#7046d8,#416fd8);border-bottom-right-radius:4px}.bubble.other{background:#1b1e28;border-bottom-left-radius:4px}.bubble small{display:block;opacity:.55;font-size:9px;margin-top:4px}.bubble img,.bubble video{max-width:260px;border-radius:12px}.chatInput{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}.chatInput input{flex:1;background:#191c25;border:1px solid var(--line);border-radius:25px;padding:13px;color:#fff;outline:none}.roundSend{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--purple),var(--blue))}.chatTools{display:flex;gap:5px}.chatTools button{background:transparent;font-size:20px}
+
+/* PROFILE */
+.profileWrap{max-width:760px;margin:auto}.profileHead{display:flex;gap:28px;align-items:center;padding:15px 0 28px;border-bottom:1px solid var(--line)}.bigAvatar{width:110px;height:110px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--pink),var(--purple),var(--blue));font-size:40px;font-weight:900;overflow:hidden}.bigAvatar img{width:100%;height:100%;object-fit:cover}.profileInfo{flex:1}.profileInfo h2{font-size:24px}.stats{display:flex;gap:28px;margin:14px 0}.stats strong{display:block}.stats span{font-size:11px;color:var(--muted)}.smallBtn{padding:9px 15px;border-radius:9px;background:var(--panel2);border:1px solid var(--line)}.profileGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:20px}.profileGrid div{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:40px;background:linear-gradient(135deg,#19132e,#142a45)}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:#000b;backdrop-filter:blur(15px);display:none;align-items:center;justify-content:center;z-index:100}.modalBox{width:440px;max-width:92%;background:#151720;border:1px solid #ffffff15;border-radius:24px;padding:28px}.modalBox h2{margin-bottom:18px}.modalBox input,.modalBox textarea,.modalBox select{width:100%;background:#20232e;border:1px solid var(--line);color:#fff;padding:13px;border-radius:11px;margin:5px 0;outline:none}.close{float:right;background:none;font-size:21px}.option{padding:14px;border:1px solid var(--line);border-radius:13px;margin:8px 0;background:#11131a;display:flex;justify-content:space-between;align-items:center}.option input{width:auto}.danger{background:#ef4444!important}
+
+/* VAULT */
+.vaultHero{text-align:center;padding:30px}.lockIcon{font-size:70px}.pin{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:18px}.pin button{height:52px;border-radius:12px;background:#20232e;border:1px solid var(--line)}
+
+/* ADMIN */
+.adminCards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.adminCard{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}.adminCard strong{font-size:24px;display:block}.adminCard span{font-size:11px;color:var(--muted)}.adminList{margin-top:18px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px}.adminRow{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}.adminRow:last-child{border:0}.adminRow .grow{flex:1}
+
+/* MOBILE */
+.mobileNav{display:none}
+@media(max-width:800px){
+.sidebar{display:none}.main{margin:0;padding:18px 12px 80px}.mobileNav{position:fixed;left:0;right:0;bottom:0;height:64px;background:#0b0d13ee;backdrop-filter:blur(20px);border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:center;z-index:50}.mobileNav button{background:none;font-size:21px}.messageLayout{grid-template-columns:1fr;height:calc(100vh - 115px)}.contacts{display:none}.grid{grid-template-columns:repeat(3,1fr)}.postmedia{height:390px}.profileHead{gap:16px}.bigAvatar{width:85px;height:85px}.stats{gap:14px}.adminCards{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN / CREATE ACCOUNT -->
+<section id="login">
+<div class="auth">
+<div class="brand">NOVA</div>
+<div class="tag">Connect. Create. Live.</div>
+
+<div id="loginForm">
+<input id="loginUsername" placeholder="Username">
+<input id="loginPassword" type="password" placeholder="Password">
+<button class="btn" onclick="login()">Log in</button>
+<button class="btn outline" onclick="showSignup()">Create account</button>
+<div class="auth-switch">Forgot password?</div>
+<div style="text-align:center;margin-top:18px">
+  <button class="btn outline" style="width:auto;padding:10px 22px" onclick="showAdminLogin()">◆ Admin Login</button>
+</div>
+<div id="loginError" class="err"></div>
+</div>
+
+<div id="signupForm" class="hidden">
+<input id="signupName" placeholder="Full name">
+<input id="signupUsername" placeholder="Username">
+<input id="signupEmail" placeholder="Email or phone">
+<input id="signupPassword" type="password" placeholder="Create password">
+<input id="signupDob" type="date">
+<button class="btn" onclick="createAccount()">Create account</button>
+<button class="btn outline" onclick="showLogin()">Already have an account? Log in</button>
+<div id="signupError" class="err"></div>
+</div>
+</div>
+</section>
+
+<!-- APP -->
+<section id="app">
+<aside class="sidebar">
+<div class="sidebrand">NOVA</div>
+<div class="nav">
+<button class="active" onclick="page('home',this)"><b>⌂</b>Home</button>
+<button onclick="page('explore',this)"><b>⌕</b>Explore</button>
+<button onclick="openCreate()"><b>＋</b>Create</button>
+<button onclick="page('messages',this)"><b>💬</b>Messages</button>
+<button onclick="page('reels',this)"><b>▶</b>Reels</button>
+<button onclick="page('vault',this)"><b>🔐</b>Vault</button>
+<button onclick="page('profile',this)"><b>♙</b>Profile</button>
+<button onclick="openSettings()"><b>⚙</b>Settings</button>
+<button onclick="openAdminLogin()"><b>◆</b>Admin</button>
+</div>
+</aside>
+
+<main class="main">
+
+<!-- HOME -->
+<div id="home" class="page active">
+<div class="top"><div><h1>Welcome to NOVA ✨</h1><p id="welcome"></p></div><div class="top-actions"><button class="circle">♡</button><button class="circle" onclick="page('messages')">✉</button></div></div>
+<div class="stories">
+<div class="story" onclick="openCreate()"><div class="ring"><div class="story-in">＋</div></div><small>Your story</small></div>
+<div class="story"><div class="ring"><div class="story-in">A</div></div><small>alex</small></div>
+<div class="story"><div class="ring"><div class="story-in">S</div></div><small>sarah</small></div>
+<div class="story"><div class="ring"><div class="story-in">J</div></div><small>james</small></div>
+<div class="story"><div class="ring"><div class="story-in">O</div></div><small>olivia</small></div>
+<div class="story"><div class="ring"><div class="story-in">🔥</div></div><small>trending</small></div>
+</div>
+<div class="feed">
+<div class="post">
+<div class="posthead"><div class="avatar">A</div><div class="user"><strong>alex.motion</strong><small>3h · Public</small></div><button class="more">•••</button></div>
+<div class="postmedia">🌅</div>
+<div class="postactions"><button onclick="like(this)">♡</button><button>💬</button><button>➤</button><button class="save">🔖</button></div>
+<div class="likes"><b class="likeNum">1,245</b> likes</div>
+<div class="caption"><b>alex.motion</b> Chasing sunsets and creating memories ✨<br><span style="color:#8f95a6">#nova #travel #moments</span></div>
+</div>
+<div class="post">
+<div class="posthead"><div class="avatar">S</div><div class="user"><strong>sarah.daily</strong><small>5h · Friends</small></div><button class="more">•••</button></div>
+<div class="postmedia">🎧</div>
+<div class="postactions"><button onclick="like(this)">♡</button><button>💬</button><button>➤</button><button class="save">🔖</button></div>
+<div class="likes"><b class="likeNum">892</b> likes</div>
+<div class="caption"><b>sarah.daily</b> New day, new energy ⚡</div>
+</div>
+</div>
+</div>
+
+<!-- EXPLORE -->
+<div id="explore" class="page">
+<div class="top"><h1>Explore</h1></div>
+<input class="search" placeholder="🔎 Search people, posts, hashtags...">
+<div class="grid">
+<div class="tile">🌌</div><div class="tile">🏏</div><div class="tile">🎵</div><div class="tile">🌄</div>
+<div class="tile">🔥</div><div class="tile">💻</div><div class="tile">📸</div><div class="tile">🎮</div>
+<div class="tile">✈️</div><div class="tile">⚡</div><div class="tile">🌊</div><div class="tile">🎬</div>
+</div>
+</div>
+
+<!-- REELS -->
+<div id="reels" class="page">
+<div class="top"><h1>Reels</h1><p>Short videos for your world</p></div>
+<div class="feed">
+<div class="post"><div class="postmedia" style="height:600px">🎬</div><div class="caption"><b>dance.zone</b> Feeling the beat! 🔥<br>🎵 One Dance · Drake</div></div>
+<div class="post"><div class="postmedia" style="height:600px">🏏</div><div class="caption"><b>sportlife</b> Weekend energy! 🏏</div></div>
+</div>
+</div>
+
+<!-- MESSAGES -->
+<div id="messages" class="page">
+<div class="top"><div><h1>Messages</h1><p>Private conversations</p></div><button class="circle" onclick="newGroup()">＋</button></div>
+<div class="messageLayout">
+<div class="contacts">
+<div class="contactTitle">Chats</div>
+<div id="otherContact" class="contact sel" onclick="openOtherUserChat()"></div>
+</div>
+<div class="chat">
+<div class="chatHead"><div class="avatar" id="chatAvatar">L</div><div class="chatInfo"><strong id="chatName">Luna</strong><small>● Active now</small></div><div class="callBtns"><button onclick="call('Voice')">📞</button><button onclick="call('Video')">📹</button><button onclick="chatMenu()">⋮</button></div></div>
+<div class="chatBody" id="chatBody"></div>
+<div class="chatInput">
+<div class="chatTools"><button onclick="document.getElementById('mediaInput').click()">📎</button><button onclick="voiceMessage()">🎙</button></div>
+<input id="chatInput" placeholder="Message..." onkeydown="if(event.key==='Enter')sendMessage()">
+<button class="roundSend" onclick="sendMessage()">➤</button>
+</div>
+<input id="mediaInput" type="file" hidden accept="image/*,video/*" onchange="sendMedia(event)">
+</div>
+</div>
+</div>
+
+<!-- PROFILE -->
+<div id="profile" class="page">
+<div class="top"><h1>Profile</h1><button class="circle" onclick="openEdit()">⚙</button></div>
+<div class="profileWrap">
+<div class="profileHead"><div class="bigAvatar" id="bigAvatar">N</div><div class="profileInfo"><h2 id="profileUsername">nova_user</h2><div class="stats"><div><strong>12</strong><span>Posts</span></div><div><strong>2.4K</strong><span>Followers</span></div><div><strong>320</strong><span>Following</span></div></div><button class="smallBtn" onclick="openEdit()">Edit profile</button></div></div>
+<div style="padding:17px 0"><b id="profileName">NOVA User</b><p id="profileBio" style="color:#9aa0af;margin-top:5px">Connect. Create. Live. ✨</p></div>
+<div class="profileGrid"><div>🌅</div><div>🏏</div><div>🎧</div><div>🔥</div><div>💻</div><div>🌊</div></div>
+</div>
+</div>
+
+<!-- VAULT -->
+<div id="vault" class="page">
+<div class="top"><h1>NOVA Vault</h1><button class="circle" onclick="openVaultInfo()">?</button></div>
+<div class="profileWrap"><div class="modalBox vaultHero" style="margin:auto"><div class="lockIcon">🔐</div><h2>Your private space</h2><p style="color:#9298a9">Store photos, videos and notes securely.</p><div id="pinDots" style="font-size:24px;letter-spacing:8px;margin:18px">••••</div><div class="pin">
+<button onclick="pin(1)">1</button><button onclick="pin(2)">2</button><button onclick="pin(3)">3</button>
+<button onclick="pin(4)">4</button><button onclick="pin(5)">5</button><button onclick="pin(6)">6</button>
+<button onclick="pin(7)">7</button><button onclick="pin(8)">8</button><button onclick="pin(9)">9</button>
+<button onclick="pin('C')">C</button><button onclick="pin(0)">0</button><button onclick="pin('⌫')">⌫</button>
+</div></div></div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin" class="page">
+<div class="top"><div><h1>NOVA Admin</h1><p>Private administration dashboard</p></div><button class="smallBtn" onclick="logout()">Log out</button></div>
+<div class="adminCards">
+<div class="adminCard"><strong>12,589</strong><span>Users</span></div><div class="adminCard"><strong>8,763</strong><span>Posts</span></div><div class="adminCard"><strong>156</strong><span>Reports</span></div><div class="adminCard"><strong>1,942</strong><span>Active now</span></div>
+</div>
+<div class="adminList"><div style="display:flex;justify-content:space-between;align-items:center"><h3>Persistent Chat Archive</h3><button class="smallBtn" onclick="refreshAdminArchive()">Refresh</button></div><p style="color:#9298a9;font-size:12px;margin:7px 0 15px">Participant messages disappear from their chat after 5 minutes, but the admin archive remains.</p><div id="adminArchiveList"></div></div>
+</div>
+
+</main>
+
+<div class="mobileNav">
+<button onclick="page('home')">⌂</button><button onclick="page('explore')">⌕</button><button onclick="openCreate()">＋</button><button onclick="page('messages')">💬</button><button onclick="page('profile')">♙</button>
+</div>
+</section>
+
+<!-- ADMIN LOGIN -->
+<div class="modal" id="adminLoginModal">
+<div class="modalBox">
+<button class="close" onclick="closeModal('adminLoginModal')">✕</button>
+<h2>◆ NOVA Admin</h2>
+<p style="color:#9298a9;font-size:13px;margin-bottom:15px">Authorized administrator access only.</p>
+<input id="adminUsername" placeholder="Admin username">
+<input id="adminPassword" type="password" placeholder="Admin password">
+<button class="btn" onclick="adminLogin()">Admin Login</button>
+<p id="adminLoginError" class="err"></p>
+</div>
+</div>
+
+<!-- CREATE -->
+<div class="modal" id="createModal"><div class="modalBox"><button class="close" onclick="closeModal('createModal')">✕</button><h2>Create</h2><input id="postCaption" placeholder="Write a caption..."><button class="btn" onclick="document.getElementById('postFile').click()">📸 Choose photo/video</button><input id="postFile" type="file" hidden accept="image/*,video/*" onchange="previewPost(event)"><div id="postPreview" style="margin-top:10px"></div><button class="btn" onclick="publishPost()">Publish</button></div></div>
+
+<!-- EDIT PROFILE -->
+<div class="modal" id="editModal"><div class="modalBox"><button class="close" onclick="closeModal('editModal')">✕</button><h2>Edit profile</h2><input id="editName" placeholder="Name"><input id="editUsername" placeholder="Username"><textarea id="editBio" rows="4" placeholder="Bio"></textarea><input id="profilePhoto" type="file" accept="image/*" onchange="changePhoto(event)"><button class="btn" onclick="saveProfile()">Save changes</button></div></div>
+
+<!-- SETTINGS -->
+<div class="modal" id="settingsModal"><div class="modalBox"><button class="close" onclick="closeModal('settingsModal')">✕</button><h2>Settings & Privacy</h2><div class="option">🌙 Dark mode <input type="checkbox" checked></div><div class="option">🔔 Notifications <input type="checkbox" checked></div><div class="option">👥 Private account <input type="checkbox"></div><button class="btn danger" onclick="logout()">Log out</button></div></div>
+
+<!-- CHAT SETTINGS -->
+<div class="modal" id="chatSettings"><div class="modalBox"><button class="close" onclick="closeModal('chatSettings')">✕</button><h2>Disappearing Chat</h2><p style="color:#9298a9;margin-bottom:15px">For the two NOVA accounts, participant chat messages automatically disappear after 5 minutes.</p><div class="option">⏱️ Disappear after <b>5 minutes</b></div><p style="color:#9298a9;font-size:12px;margin-top:12px">The admin copy remains available in the admin dashboard.</p></div></div>
+
+<!-- CALL -->
+<div class="modal" id="callModal"><div class="modalBox" style="text-align:center"><div class="bigAvatar" style="margin:auto" id="callAvatar">L</div><h2 id="callTitle" style="margin-top:18px">Voice calling...</h2><p style="color:#9298a9">NOVA secure call</p><button class="btn danger" onclick="closeModal('callModal')">End call</button></div></div>
+
+<script>
+const USERS_KEY="nova_users";
+let currentUser=null,currentChat="",disappearMinutes=5,pinCode="";
+
+function users(){return JSON.parse(localStorage.getItem(USERS_KEY)||"{}")}
+function saveUsers(u){localStorage.setItem(USERS_KEY,JSON.stringify(u))}
+function adminArchive(item){
+ const archive=JSON.parse(localStorage.getItem("nova_admin_archive")||"[]");
+ archive.push({...item, archivedAt:new Date().toISOString()});
+ localStorage.setItem("nova_admin_archive",JSON.stringify(archive));
+}
+
+function showSignup(){document.getElementById("loginForm").classList.add("hidden");document.getElementById("signupForm").classList.remove("hidden")}
+function showLogin(){document.getElementById("signupForm").classList.add("hidden");document.getElementById("loginForm").classList.remove("hidden")}
+
+function createAccount(){
+ const name=document.getElementById("signupName").value.trim(),u=document.getElementById("signupUsername").value.trim().toLowerCase(),email=document.getElementById("signupEmail").value.trim(),p=document.getElementById("signupPassword").value,dob=document.getElementById("signupDob").value;
+ const er=document.getElementById("signupError");
+ if(!name||!u||!email||!p||!dob){er.textContent="Please complete all fields.";return}
+ const all=users(); if(all[u]){er.textContent="Username already exists.";return}
+ all[u]={name,email,password:p,dob,bio:"Connect. Create. Live. ✨",photo:""};saveUsers(all);currentUser=u;openApp();
+}
+
+function login(){
+ const u=document.getElementById("loginUsername").value.trim().toLowerCase(),p=document.getElementById("loginPassword").value.trim(),all=users();
+ const a=all[u];
+ if(a&&a.password===p){currentUser=u;openApp()}else document.getElementById("loginError").textContent="Invalid username or password.";
+}
+
+function openApp(){
+ document.getElementById("login").style.display="none";
+ document.getElementById("app").style.display="block";
+ updateProfile();
+ configureContacts();
+ page("home");
+}
+function page(id,btn){
+ document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+ const el=document.getElementById(id);if(el)el.classList.add("active"); if(id==="messages") setTimeout(loadChatMessages,0);
+ document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));
+ if(btn)btn.classList.add("active");
+}
+function like(btn){let n=btn.closest(".post").querySelector(".likeNum"),v=parseInt(n.textContent.replace(",",""));if(btn.textContent==="♡"){v++;btn.textContent="♥"}else{v--;btn.textContent="♡"}n.textContent=v.toLocaleString()}
+function openCreate(){document.getElementById("createModal").style.display="flex"}
+function openSettings(){document.getElementById("settingsModal").style.display="flex"}
+function closeModal(id){document.getElementById(id).style.display="none"}
+
+function chatKey(){
+ return "nova_chat_vignesh_thilo";
+}
+function otherUsername(){
+ return currentUser==="thilo" ? "vignesh" : "thilo";
+}
+function displayName(username){
+ const a=users()[username];
+ return a ? a.name : username.charAt(0).toUpperCase()+username.slice(1);
+}
+function getChatMessages(){
+ return JSON.parse(localStorage.getItem(chatKey())||"[]");
+}
+function saveChatMessages(list){
+ localStorage.setItem(chatKey(),JSON.stringify(list));
+}
+function configureContacts(){
+ const other=otherUsername();
+ const letter=other.charAt(0).toUpperCase();
+ currentChat=other;
+ document.getElementById("otherContact").innerHTML=
+   '<div class="avatar">'+letter+'</div>'+
+   '<div class="info"><strong>'+displayName(other)+'</strong><small>Available to chat</small></div>'+
+   '<div class="dot"></div>';
+ document.getElementById("chatName").textContent=displayName(other);
+ document.getElementById("chatAvatar").textContent=letter;
+ loadChatMessages();
+}
+function openOtherUserChat(){
+ const other=otherUsername();
+ selectChat(other,other.charAt(0).toUpperCase());
+ page("messages");
+ loadChatMessages();
+}
+function selectChat(name,letter){
+ currentChat=name.toLowerCase();
+ document.getElementById("chatName").textContent=displayName(currentChat);
+ document.getElementById("chatAvatar").textContent=letter;
+ loadChatMessages();
+}
+function loadChatMessages(){
+ const body=document.getElementById("chatBody");
+ if(!body)return;
+ const all=getChatMessages();
+ const now=Date.now();
+
+ /* Participant view: expired messages are hidden. */
+ const visible=all.filter(m=>!m.expiresAt || m.expiresAt>now);
+ body.innerHTML="";
+
+ if(!visible.length){
+   body.innerHTML='<div style="text-align:center;color:#73798a;font-size:12px;padding:30px">Start a conversation ✨</div>';
+   return;
+ }
+
+ visible.forEach(m=>{
+   const b=document.createElement("div");
+   b.className="bubble "+(m.sender===currentUser?"me":"other");
+
+   if(m.type==="image"){
+     b.innerHTML='<img src="'+m.content+'"><small>'+escapeHtml(m.time)+(m.sender===currentUser?' · Sent':'')+'</small>';
+   }else if(m.type==="video"){
+     b.innerHTML='<video controls src="'+m.content+'"></video><small>'+escapeHtml(m.time)+(m.sender===currentUser?' · Sent':'')+'</small>';
+   }else if(m.type==="voice"){
+     b.innerHTML='🎙️ '+escapeHtml(m.content)+'<small>'+escapeHtml(m.time)+'</small>';
+   }else{
+     b.innerHTML=escapeHtml(m.content)+'<small>'+escapeHtml(m.time)+(m.sender===currentUser?' · Sent':'')+'</small>';
+   }
+   body.appendChild(b);
+ });
+ scrollChat();
+}
+function sendMessage(){
+ const input=document.getElementById("chatInput");
+ const text=input.value.trim();
+ if(!text)return;
+
+ const now=new Date();
+ const msg={
+   id:Date.now()+Math.random(),
+   sender:currentUser,
+   recipient:otherUsername(),
+   type:"text",
+   content:text,
+   time:now.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}),
+   expiresAt:Date.now()+5*60000
+ };
+ const list=getChatMessages();
+ list.push(msg);
+ saveChatMessages(list);
+
+ /* Admin keeps a permanent copy. */
+ adminArchive({
+   sender:currentUser,
+   chatWith:otherUsername(),
+   type:"text",
+   content:text,
+   time:now.toLocaleString()
+ });
+
+ input.value="";
+ loadChatMessages();
+
+ setTimeout(()=>{
+   loadChatMessages();
+ },5*60000);
+}
+function sendMedia(e){
+ const f=e.target.files[0];
+ if(!f)return;
+
+ const reader=new FileReader();
+ reader.onload=ev=>{
+   const now=new Date();
+   const type=f.type.startsWith("image")?"image":"video";
+   const msg={
+     id:Date.now()+Math.random(),
+     sender:currentUser,
+     recipient:otherUsername(),
+     type:type,
+     content:ev.target.result,
+     time:now.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}),
+     expiresAt:Date.now()+5*60000
+   };
+   const list=getChatMessages();
+   list.push(msg);
+   saveChatMessages(list);
+
+   adminArchive({
+     sender:currentUser,
+     chatWith:otherUsername(),
+     type:type,
+     content:ev.target.result,
+     time:now.toLocaleString()
+   });
+
+   loadChatMessages();
+   setTimeout(()=>loadChatMessages(),5*60000);
+ };
+ reader.readAsDataURL(f);
+ e.target.value="";
+}
+function voiceMessage(){
+ const now=new Date();
+ const msg={
+   id:Date.now()+Math.random(),
+   sender:currentUser,
+   recipient:otherUsername(),
+   type:"voice",
+   content:"Voice message · 0:12",
+   time:now.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}),
+   expiresAt:Date.now()+5*60000
+ };
+ const list=getChatMessages();
+ list.push(msg);
+ saveChatMessages(list);
+ adminArchive({
+   sender:currentUser,
+   chatWith:otherUsername(),
+   type:"voice",
+   content:"Voice message · 0:12",
+   time:now.toLocaleString()
+ });
+ loadChatMessages();
+ setTimeout(()=>loadChatMessages(),5*60000);
+}
+function scrollChat(){
+ const x=document.getElementById("chatBody");
+ if(x)x.scrollTop=x.scrollHeight;
+}
+function call(type){document.getElementById("callTitle").textContent=type+" calling...";document.getElementById("callModal").style.display="flex"}
+
+function updateProfile(){
+ const a=users()[currentUser];if(!a)return;
+ document.getElementById("welcome").textContent=`You're signed in as @${currentUser}`;
+ document.getElementById("profileUsername").textContent="@"+currentUser;
+ document.getElementById("profileName").textContent=a.name;
+ document.getElementById("profileBio").textContent=a.bio||"Connect. Create. Live. ✨";
+ document.getElementById("bigAvatar").innerHTML=a.photo?`<img src="${a.photo}">`:a.name.charAt(0).toUpperCase();
+}
+function openEdit(){const a=users()[currentUser];document.getElementById("editName").value=a.name;document.getElementById("editUsername").value=currentUser;document.getElementById("editBio").value=a.bio||"";document.getElementById("editModal").style.display="flex"}
+function saveProfile(){const all=users(),a=all[currentUser];a.name=document.getElementById("editName").value.trim()||a.name;a.bio=document.getElementById("editBio").value.trim();saveUsers(all);updateProfile();closeModal("editModal")}
+function changePhoto(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=x=>{const all=users();all[currentUser].photo=x.target.result;saveUsers(all);updateProfile()};r.readAsDataURL(f)}
+function previewPost(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=x=>{document.getElementById("postPreview").innerHTML=f.type.startsWith("image")?`<img style="width:100%;border-radius:12px" src="${x.target.result}">`:`<video controls style="width:100%;border-radius:12px" src="${x.target.result}"></video>`};r.readAsDataURL(f)}
+function publishPost(){alert("Post published in the prototype.");closeModal("createModal")}
+function newGroup(){alert("Group creation UI can be connected to the backend next.")}
+function openVaultInfo(){alert("NOVA Vault is a private storage feature. A production version should use server-side encryption and proper authentication.")}
+function pin(n){if(n==="C"){pinCode="";document.getElementById("pinDots").textContent="••••";return}if(n==="⌫"){pinCode=pinCode.slice(0,-1)}else pinCode+=n;document.getElementById("pinDots").textContent=pinCode.replace(/./g,"●");if(pinCode.length>=4){alert("Vault prototype unlocked.");pinCode="" ;document.getElementById("pinDots").textContent="••••"}}
+function showAdminLogin(){
+ document.getElementById("adminLoginModal").style.display="flex";
+ document.getElementById("adminLoginError").textContent="";
+ document.getElementById("adminUsername").value="";
+ document.getElementById("adminPassword").value="";
+}
+function adminLogin(){
+ const u=document.getElementById("adminUsername").value.trim();
+ const p=document.getElementById("adminPassword").value;
+ if(u==="admin"&&p==="8220982419"){
+   closeModal("adminLoginModal");
+   document.getElementById("login").style.display="none";
+   document.getElementById("app").style.display="block";
+   pageUnlocked=true;
+   page("admin");
+   pageUnlocked=false;
+   refreshAdminArchive();
+ }else{
+   document.getElementById("adminLoginError").textContent="Invalid admin credentials.";
+ }
+}
+function openAdminLogin(){showAdminLogin()}
+function refreshAdminArchive(){
+ const box=document.getElementById("adminArchiveList");if(!box)return;
+ const archive=JSON.parse(localStorage.getItem("nova_admin_archive")||"[]");
+ if(!archive.length){box.innerHTML='<p style="color:#9298a9">No archived chat messages yet.</p>';return}
+ box.innerHTML=archive.slice().reverse().map(x=>{
+   let body=x.type==="image" ? '<img src="'+x.content+'" style="max-width:180px;border-radius:10px;margin-top:7px">' :
+            x.type==="video" ? '<video controls src="'+x.content+'" style="max-width:220px;border-radius:10px;margin-top:7px"></video>' :
+            x.type==="voice" ? '🎙️ '+escapeHtml(x.content) : escapeHtml(x.content);
+   return '<div class="adminRow"><div class="avatar">'+escapeHtml((x.sender||"?").charAt(0).toUpperCase())+'</div><div class="grow"><b>'+escapeHtml(x.sender||"Unknown")+' → '+escapeHtml(x.chatWith||"Unknown")+'</b><small style="display:block;color:#9298a9">'+x.type+' · '+escapeHtml(x.time||"")+'</small>'+body+'</div></div>';
+ }).join("");
+}
+function logout(){currentUser=null;document.getElementById("app").style.display="none";document.getElementById("login").style.display="flex";showLogin()}
+function escapeHtml(t){const d=document.createElement("div");d.textContent=t;return d.innerHTML}
+
+window.addEventListener("load",()=>{
+ const old=users();
+ const fixed={
+  thilo:{name:"Thilo",email:"thilo@nova.app",password:"12345678",bio:old.thilo?.bio||"Connect. Create. Live. ✨",photo:old.thilo?.photo||""},
+  vignesh:{name:"Vignesh",email:"vignesh@nova.app",password:"12345678",bio:old.vignesh?.bio||"Connect. Create. Live. ✨",photo:old.vignesh?.photo||""}
+ };
+ saveUsers(fixed);
+});</script>
+</body>
+</html>
